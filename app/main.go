@@ -21,7 +21,9 @@ func main() {
 	log.Println("启动")
 	mongoURL := config.ReadMongoConfig("mongo")
 
-	timeDuration := 100 * time.Second
+	duration := config.ReadCustomIntConfig("mongo.duration", false)
+
+	timeDuration := time.Duration(duration) * time.Second
 
 	adapter, err := _casbinAdapter.NewAdapter(mongoURL, timeDuration)
 
@@ -41,10 +43,11 @@ func main() {
 	casbinService := _grpcDelivery.NewCasbinService(permissionUseCase)
 
 	server := grpc.NewServer()
-	// pb.RegisterSearchServiceServer(server, &SearchService{})
+
 	pb.RegisterCasbinServer(server, casbinService)
 
-	lis, err := net.Listen("tcp", ":"+"9001")
+	port := config.ReadCustomStringConfig("grpc.port")
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("net.Listen err: %v", err)
 	}
