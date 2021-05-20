@@ -52,5 +52,8 @@ func main() {
 		log.Fatalf("net.Listen err: %v", err)
 	}
 
-	server.Serve(lis)
+	err = server.Serve(lis)
+	if err != nil {
+		log.Fatalf("serve fail: %v", err)
+	}
 }
