@@ -9,4 +9,5 @@ type PermissionRequest interface {
 // PermissionUseCase -
 type PermissionUseCase interface {
 	HasPermissionForUser(PermissionRequest) (bool, error)
+	LoadPolicy() error
 }

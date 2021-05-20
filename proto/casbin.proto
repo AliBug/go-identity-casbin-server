@@ -10,6 +10,11 @@ message PermissionRequest {
   string user = 1;
   repeated string permissions = 2;
 }
+
+message Empty {
+}
+
 service Casbin {
   rpc HasPermissionForUser (PermissionRequest) returns (BoolReply) {}
+  rpc LoadPolicy(Empty) returns (Empty)  {}
 }

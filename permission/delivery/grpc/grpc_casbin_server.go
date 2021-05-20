@@ -26,3 +26,13 @@ func (s *casbinService) HasPermissionForUser(ctx context.Context, r *pb.Permissi
 	log.Println("final result: ", result)
 	return &pb.BoolReply{Res: result}, nil
 }
+
+func (s *casbinService) LoadPolicy(ctx context.Context, r *pb.Empty) (*pb.Empty, error) {
+	err := s.permissionsUC.LoadPolicy()
+	if err != nil {
+		log.Printf("😯 err:%v", err)
+		return nil, err
+	}
+	log.Println("✅  load policy ok!")
+	return &pb.Empty{}, nil
+}

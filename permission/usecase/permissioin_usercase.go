@@ -18,12 +18,12 @@ func NewPermissionUsecase(enforcer *casbin.Enforcer) domain.PermissionUseCase {
 	return &permissionUsecase{enforcer: enforcer}
 }
 
-/*
-func (r *permissionUsecase) HasPermissionForUser(user string, permissions ...string) bool {
-	return r.enforcer.HasPermissionForUser(user, permissions...)
+// LoadPolicy -
+func (uc *permissionUsecase) LoadPolicy() error {
+	return uc.enforcer.LoadPolicy()
 }
-*/
 
+// HasPermissionForUser -
 func (uc *permissionUsecase) HasPermissionForUser(req domain.PermissionRequest) (bool, error) {
 	// log.Println("req user: ", req.GetUser())
 	// log.Println("req permis: ", req.GetPermissions())
