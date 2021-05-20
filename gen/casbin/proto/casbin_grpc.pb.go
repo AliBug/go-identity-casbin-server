@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type CasbinClient interface {
 	HasPermissionForUser(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*BoolReply, error)
 	LoadPolicy(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	AddRoleForUserInDomain(ctx context.Context, in *UserDomainRoleRequest, opts ...grpc.CallOption) (*BoolReply, error)
 }
 
 type casbinClient struct {
@@ -48,12 +49,22 @@ func (c *casbinClient) LoadPolicy(ctx context.Context, in *Empty, opts ...grpc.C
 	return out, nil
 }
 
+func (c *casbinClient) AddRoleForUserInDomain(ctx context.Context, in *UserDomainRoleRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/AddRoleForUserInDomain", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CasbinServer is the server API for Casbin service.
 // All implementations should embed UnimplementedCasbinServer
 // for forward compatibility
 type CasbinServer interface {
 	HasPermissionForUser(context.Context, *PermissionRequest) (*BoolReply, error)
 	LoadPolicy(context.Context, *Empty) (*Empty, error)
+	AddRoleForUserInDomain(context.Context, *UserDomainRoleRequest) (*BoolReply, error)
 }
 
 // UnimplementedCasbinServer should be embedded to have forward compatible implementations.
@@ -65,6 +76,9 @@ func (UnimplementedCasbinServer) HasPermissionForUser(context.Context, *Permissi
 }
 func (UnimplementedCasbinServer) LoadPolicy(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoadPolicy not implemented")
+}
+func (UnimplementedCasbinServer) AddRoleForUserInDomain(context.Context, *UserDomainRoleRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRoleForUserInDomain not implemented")
 }
 
 // UnsafeCasbinServer may be embedded to opt out of forward compatibility for this service.
@@ -114,6 +128,24 @@ func _Casbin_LoadPolicy_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Casbin_AddRoleForUserInDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserDomainRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).AddRoleForUserInDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/AddRoleForUserInDomain",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).AddRoleForUserInDomain(ctx, req.(*UserDomainRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Casbin_ServiceDesc is the grpc.ServiceDesc for Casbin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -128,6 +160,10 @@ var Casbin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoadPolicy",
 			Handler:    _Casbin_LoadPolicy_Handler,
+		},
+		{
+			MethodName: "AddRoleForUserInDomain",
+			Handler:    _Casbin_AddRoleForUserInDomain_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

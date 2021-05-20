@@ -50,3 +50,15 @@ func (uc *permissionUsecase) HasPermissionForUser(req domain.PermissionRequest) 
 	log.Println("👮 fail!")
 	return false, nil
 }
+
+func (uc *permissionUsecase) AddRoleForUserInDomain(req domain.UserDomainRoleRequest) (bool, error) {
+	result, err := uc.enforcer.AddRoleForUserInDomain(req.GetUser(), req.GetRole(), req.GetDomain())
+	if err != nil {
+		return false, status.Errorf(codes.Internal, err.Error())
+	}
+	err = uc.enforcer.LoadPolicy()
+	if err != nil {
+		return false, status.Errorf(codes.Internal, err.Error())
+	}
+	return result, nil
+}
