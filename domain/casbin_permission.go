@@ -8,5 +8,5 @@ type PermissionRequest interface {
 
 // PermissionUseCase -
 type PermissionUseCase interface {
-	HasPermissionForUserInDomain(PermissionRequest) (bool, error)
+	HasPermissionForUser(PermissionRequest) (bool, error)
 }

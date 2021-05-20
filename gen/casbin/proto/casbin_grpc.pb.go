@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CasbinClient interface {
-	HasPermissionForUserInDomain(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	HasPermissionForUser(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*BoolReply, error)
 }
 
 type casbinClient struct {
@@ -29,9 +29,9 @@ func NewCasbinClient(cc grpc.ClientConnInterface) CasbinClient {
 	return &casbinClient{cc}
 }
 
-func (c *casbinClient) HasPermissionForUserInDomain(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+func (c *casbinClient) HasPermissionForUser(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*BoolReply, error) {
 	out := new(BoolReply)
-	err := c.cc.Invoke(ctx, "/proto.Casbin/HasPermissionForUserInDomain", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/HasPermissionForUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,15 +42,15 @@ func (c *casbinClient) HasPermissionForUserInDomain(ctx context.Context, in *Per
 // All implementations should embed UnimplementedCasbinServer
 // for forward compatibility
 type CasbinServer interface {
-	HasPermissionForUserInDomain(context.Context, *PermissionRequest) (*BoolReply, error)
+	HasPermissionForUser(context.Context, *PermissionRequest) (*BoolReply, error)
 }
 
 // UnimplementedCasbinServer should be embedded to have forward compatible implementations.
 type UnimplementedCasbinServer struct {
 }
 
-func (UnimplementedCasbinServer) HasPermissionForUserInDomain(context.Context, *PermissionRequest) (*BoolReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HasPermissionForUserInDomain not implemented")
+func (UnimplementedCasbinServer) HasPermissionForUser(context.Context, *PermissionRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HasPermissionForUser not implemented")
 }
 
 // UnsafeCasbinServer may be embedded to opt out of forward compatibility for this service.
@@ -64,20 +64,20 @@ func RegisterCasbinServer(s grpc.ServiceRegistrar, srv CasbinServer) {
 	s.RegisterService(&Casbin_ServiceDesc, srv)
 }
 
-func _Casbin_HasPermissionForUserInDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Casbin_HasPermissionForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PermissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CasbinServer).HasPermissionForUserInDomain(ctx, in)
+		return srv.(CasbinServer).HasPermissionForUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Casbin/HasPermissionForUserInDomain",
+		FullMethod: "/proto.Casbin/HasPermissionForUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CasbinServer).HasPermissionForUserInDomain(ctx, req.(*PermissionRequest))
+		return srv.(CasbinServer).HasPermissionForUser(ctx, req.(*PermissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -90,8 +90,8 @@ var Casbin_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CasbinServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "HasPermissionForUserInDomain",
-			Handler:    _Casbin_HasPermissionForUserInDomain_Handler,
+			MethodName: "HasPermissionForUser",
+			Handler:    _Casbin_HasPermissionForUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

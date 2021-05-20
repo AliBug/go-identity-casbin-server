@@ -11,5 +11,5 @@ message PermissionRequest {
   repeated string permissions = 2;
 }
 service Casbin {
-  rpc HasPermissionForUserInDomain (PermissionRequest) returns (BoolReply) {}
+  rpc HasPermissionForUser (PermissionRequest) returns (BoolReply) {}
 }

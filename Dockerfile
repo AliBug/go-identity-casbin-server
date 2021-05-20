@@ -11,7 +11,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN go env && go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o server
+# RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o server
+RUN CGO_ENABLED=0 go build -o server
 
 FROM alpine:3.13 
 LABEL MAINTAINER="leijinchao@gmail.com"
