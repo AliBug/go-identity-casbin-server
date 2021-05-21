@@ -6,17 +6,32 @@ type PermissionRequest interface {
 	GetPermissions() []string
 }
 
-// UserDomainRoleRequest ...
-type UserDomainRoleRequest interface {
+// UserRoleInDomainRequest ...
+type UserRoleInDomainRequest interface {
 	GetUser() string
 	GetDomain() string
 	GetRole() string
 }
 
+// UserRequest ...
+type UserRequest interface {
+	GetUser() string
+}
+
 // PermissionUseCase -
 type PermissionUseCase interface {
-	HasPermissionForUser(PermissionRequest) (bool, error)
-	LoadPolicy() error
-
-	AddRoleForUserInDomain(UserDomainRoleRequest) (bool, error)
+	HasPermissionForUserUC(PermissionRequest) (bool, error)
+	AddRoleForUserInDomainUC(UserRoleInDomainRequest) (bool, error)
+	DeleteRoleForUserInDomainUC(UserRoleInDomainRequest) (bool, error)
+	DeleteRolesForUserInDomainUC(UserRoleInDomainRequest) (bool, error)
+	GetDomainsForUserUC(UserRequest) ([]string, error)
+	GetRolesForUserInDomainUC(UserRoleInDomainRequest) []string
+	GetRolesInDomainsForUserUC(UserRequest) (map[string][]string, error)
+	GetPolicies() [][]string
 }
+
+/*
+  rpc GetDomainsForUserUC(UserRequest) returns (StringsReply) {}
+  rpc GetRolesForUserInDomain(UserRoleInDomainRequest) returns (StringsReply) {}
+  rpc GetRolesInDomainsForUser(UserRequest) returns (RolesInDomains) {}
+*/

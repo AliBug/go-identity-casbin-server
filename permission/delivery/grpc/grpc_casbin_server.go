@@ -18,7 +18,7 @@ func NewCasbinService(p domain.PermissionUseCase) pb.CasbinServer {
 }
 
 func (s *casbinService) HasPermissionForUser(ctx context.Context, req *pb.PermissionRequest) (*pb.BoolReply, error) {
-	result, err := s.permissionsUC.HasPermissionForUser(req)
+	result, err := s.permissionsUC.HasPermissionForUserUC(req)
 	if err != nil {
 		log.Printf("😯 err:%v", err)
 		return nil, err
@@ -27,20 +27,72 @@ func (s *casbinService) HasPermissionForUser(ctx context.Context, req *pb.Permis
 	return &pb.BoolReply{Res: result}, nil
 }
 
-func (s *casbinService) LoadPolicy(ctx context.Context, r *pb.Empty) (*pb.Empty, error) {
-	err := s.permissionsUC.LoadPolicy()
-	if err != nil {
-		log.Printf("😯 err:%v", err)
-		return nil, err
-	}
-	log.Println("✅  load policy ok!")
-	return &pb.Empty{}, nil
-}
-
-func (s *casbinService) AddRoleForUserInDomain(ctx context.Context, req *pb.UserDomainRoleRequest) (*pb.BoolReply, error) {
-	result, err := s.permissionsUC.AddRoleForUserInDomain(req)
+func (s *casbinService) AddRoleForUserInDomain(ctx context.Context, req *pb.UserRoleInDomainRequest) (*pb.BoolReply, error) {
+	result, err := s.permissionsUC.AddRoleForUserInDomainUC(req)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.BoolReply{Res: result}, nil
+}
+
+func (s *casbinService) DeleteRoleForUserInDomain(ctx context.Context, req *pb.UserRoleInDomainRequest) (*pb.BoolReply, error) {
+	result, err := s.permissionsUC.DeleteRoleForUserInDomainUC(req)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.BoolReply{Res: result}, nil
+}
+
+func (s *casbinService) DeleteRolesForUserInDomain(ctx context.Context, req *pb.UserRoleInDomainRequest) (*pb.BoolReply, error) {
+	result, err := s.permissionsUC.DeleteRolesForUserInDomainUC(req)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.BoolReply{Res: result}, nil
+}
+
+func (s *casbinService) GetDomainsForUser(ctx context.Context, req *pb.UserRequest) (*pb.StringArrayReply, error) {
+	domains, err := s.permissionsUC.GetDomainsForUserUC(req)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.StringArrayReply{Data: domains}, nil
+}
+
+func (s *casbinService) GetRolesForUserInDomain(ctx context.Context, req *pb.UserRoleInDomainRequest) (*pb.StringArrayReply, error) {
+	roles := s.permissionsUC.GetRolesForUserInDomainUC(req)
+	return &pb.StringArrayReply{Data: roles}, nil
+}
+
+func (s *casbinService) GetRolesInDomainsForUser(ctx context.Context, req *pb.UserRequest) (*pb.MapStringArrayReply, error) {
+	results, err := s.permissionsUC.GetRolesInDomainsForUserUC(req)
+	if err != nil {
+		return nil, err
+	}
+	var list = make(map[string]*pb.StringArrayReply)
+	for key, v := range results {
+		roles := &pb.StringArrayReply{
+			Data: v,
+		}
+		list[key] = roles
+	}
+	return &pb.MapStringArrayReply{Data: list}, nil
+}
+
+func (s *casbinService) GetPolicies(ctx context.Context, req *pb.EmptyRequest) (*pb.StringArray2DReply, error) {
+	results := s.permissionsUC.GetPolicies()
+	return wrapPlainPolicy(results), nil
+}
+
+func wrapPlainPolicy(policy [][]string) *pb.StringArray2DReply {
+	if len(policy) == 0 {
+		return &pb.StringArray2DReply{}
+	}
+
+	policyReply := &pb.StringArray2DReply{}
+	policyReply.Data = make([]*pb.StringArrayReply, len(policy))
+	for e := range policy {
+		policyReply.Data[e] = &pb.StringArrayReply{Data: policy[e]}
+	}
+	return policyReply
 }

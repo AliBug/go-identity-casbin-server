@@ -19,8 +19,13 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CasbinClient interface {
 	HasPermissionForUser(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*BoolReply, error)
-	LoadPolicy(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	AddRoleForUserInDomain(ctx context.Context, in *UserDomainRoleRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	AddRoleForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	DeleteRoleForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	DeleteRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	GetDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*StringArrayReply, error)
+	GetRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*StringArrayReply, error)
+	GetRolesInDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*MapStringArrayReply, error)
+	GetPolicies(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*StringArray2DReply, error)
 }
 
 type casbinClient struct {
@@ -40,18 +45,63 @@ func (c *casbinClient) HasPermissionForUser(ctx context.Context, in *PermissionR
 	return out, nil
 }
 
-func (c *casbinClient) LoadPolicy(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/proto.Casbin/LoadPolicy", in, out, opts...)
+func (c *casbinClient) AddRoleForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/AddRoleForUserInDomain", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *casbinClient) AddRoleForUserInDomain(ctx context.Context, in *UserDomainRoleRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+func (c *casbinClient) DeleteRoleForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error) {
 	out := new(BoolReply)
-	err := c.cc.Invoke(ctx, "/proto.Casbin/AddRoleForUserInDomain", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/DeleteRoleForUserInDomain", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) DeleteRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/DeleteRolesForUserInDomain", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) GetDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*StringArrayReply, error) {
+	out := new(StringArrayReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/GetDomainsForUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) GetRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*StringArrayReply, error) {
+	out := new(StringArrayReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/GetRolesForUserInDomain", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) GetRolesInDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*MapStringArrayReply, error) {
+	out := new(MapStringArrayReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/GetRolesInDomainsForUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) GetPolicies(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*StringArray2DReply, error) {
+	out := new(StringArray2DReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/GetPolicies", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +113,13 @@ func (c *casbinClient) AddRoleForUserInDomain(ctx context.Context, in *UserDomai
 // for forward compatibility
 type CasbinServer interface {
 	HasPermissionForUser(context.Context, *PermissionRequest) (*BoolReply, error)
-	LoadPolicy(context.Context, *Empty) (*Empty, error)
-	AddRoleForUserInDomain(context.Context, *UserDomainRoleRequest) (*BoolReply, error)
+	AddRoleForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
+	DeleteRoleForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
+	DeleteRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
+	GetDomainsForUser(context.Context, *UserRequest) (*StringArrayReply, error)
+	GetRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*StringArrayReply, error)
+	GetRolesInDomainsForUser(context.Context, *UserRequest) (*MapStringArrayReply, error)
+	GetPolicies(context.Context, *EmptyRequest) (*StringArray2DReply, error)
 }
 
 // UnimplementedCasbinServer should be embedded to have forward compatible implementations.
@@ -74,11 +129,26 @@ type UnimplementedCasbinServer struct {
 func (UnimplementedCasbinServer) HasPermissionForUser(context.Context, *PermissionRequest) (*BoolReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasPermissionForUser not implemented")
 }
-func (UnimplementedCasbinServer) LoadPolicy(context.Context, *Empty) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LoadPolicy not implemented")
-}
-func (UnimplementedCasbinServer) AddRoleForUserInDomain(context.Context, *UserDomainRoleRequest) (*BoolReply, error) {
+func (UnimplementedCasbinServer) AddRoleForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddRoleForUserInDomain not implemented")
+}
+func (UnimplementedCasbinServer) DeleteRoleForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoleForUserInDomain not implemented")
+}
+func (UnimplementedCasbinServer) DeleteRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRolesForUserInDomain not implemented")
+}
+func (UnimplementedCasbinServer) GetDomainsForUser(context.Context, *UserRequest) (*StringArrayReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDomainsForUser not implemented")
+}
+func (UnimplementedCasbinServer) GetRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*StringArrayReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRolesForUserInDomain not implemented")
+}
+func (UnimplementedCasbinServer) GetRolesInDomainsForUser(context.Context, *UserRequest) (*MapStringArrayReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRolesInDomainsForUser not implemented")
+}
+func (UnimplementedCasbinServer) GetPolicies(context.Context, *EmptyRequest) (*StringArray2DReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicies not implemented")
 }
 
 // UnsafeCasbinServer may be embedded to opt out of forward compatibility for this service.
@@ -110,26 +180,8 @@ func _Casbin_HasPermissionForUser_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Casbin_LoadPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CasbinServer).LoadPolicy(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Casbin/LoadPolicy",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CasbinServer).LoadPolicy(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Casbin_AddRoleForUserInDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserDomainRoleRequest)
+	in := new(UserRoleInDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -141,7 +193,115 @@ func _Casbin_AddRoleForUserInDomain_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/proto.Casbin/AddRoleForUserInDomain",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CasbinServer).AddRoleForUserInDomain(ctx, req.(*UserDomainRoleRequest))
+		return srv.(CasbinServer).AddRoleForUserInDomain(ctx, req.(*UserRoleInDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_DeleteRoleForUserInDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRoleInDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).DeleteRoleForUserInDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/DeleteRoleForUserInDomain",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).DeleteRoleForUserInDomain(ctx, req.(*UserRoleInDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_DeleteRolesForUserInDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRoleInDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).DeleteRolesForUserInDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/DeleteRolesForUserInDomain",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).DeleteRolesForUserInDomain(ctx, req.(*UserRoleInDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_GetDomainsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).GetDomainsForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/GetDomainsForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).GetDomainsForUser(ctx, req.(*UserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_GetRolesForUserInDomain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRoleInDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).GetRolesForUserInDomain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/GetRolesForUserInDomain",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).GetRolesForUserInDomain(ctx, req.(*UserRoleInDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_GetRolesInDomainsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).GetRolesInDomainsForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/GetRolesInDomainsForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).GetRolesInDomainsForUser(ctx, req.(*UserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_GetPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).GetPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/GetPolicies",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).GetPolicies(ctx, req.(*EmptyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -158,12 +318,32 @@ var Casbin_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Casbin_HasPermissionForUser_Handler,
 		},
 		{
-			MethodName: "LoadPolicy",
-			Handler:    _Casbin_LoadPolicy_Handler,
-		},
-		{
 			MethodName: "AddRoleForUserInDomain",
 			Handler:    _Casbin_AddRoleForUserInDomain_Handler,
+		},
+		{
+			MethodName: "DeleteRoleForUserInDomain",
+			Handler:    _Casbin_DeleteRoleForUserInDomain_Handler,
+		},
+		{
+			MethodName: "DeleteRolesForUserInDomain",
+			Handler:    _Casbin_DeleteRolesForUserInDomain_Handler,
+		},
+		{
+			MethodName: "GetDomainsForUser",
+			Handler:    _Casbin_GetDomainsForUser_Handler,
+		},
+		{
+			MethodName: "GetRolesForUserInDomain",
+			Handler:    _Casbin_GetRolesForUserInDomain_Handler,
+		},
+		{
+			MethodName: "GetRolesInDomainsForUser",
+			Handler:    _Casbin_GetRolesInDomainsForUser_Handler,
+		},
+		{
+			MethodName: "GetPolicies",
+			Handler:    _Casbin_GetPolicies_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
