@@ -172,3 +172,16 @@ func (s *casbinServer) DeleteUser(ctx context.Context, req *pb.UserRoleInDomainR
 	}
 	return &pb.BoolReply{Res: result}, nil
 }
+
+func wrapPlainPolicy(policy [][]string) *pb.Array2DReply {
+	if len(policy) == 0 {
+		return &pb.Array2DReply{}
+	}
+
+	policyReply := &pb.Array2DReply{}
+	policyReply.Data = make([]*pb.ArrayReply, len(policy))
+	for e := range policy {
+		policyReply.Data[e] = &pb.ArrayReply{Data: policy[e]}
+	}
+	return policyReply
+}
