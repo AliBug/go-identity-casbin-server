@@ -22,10 +22,18 @@ type CasbinClient interface {
 	AddRoleForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
 	DeleteRoleForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
 	DeleteRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
-	GetDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*StringArrayReply, error)
-	GetRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*StringArrayReply, error)
-	GetRolesInDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*MapStringArrayReply, error)
-	GetPolicies(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*StringArray2DReply, error)
+	GetDomainsForUser(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*ArrayReply, error)
+	GetRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*ArrayReply, error)
+	GetRolesInDomainsForUser(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*MapArrayReply, error)
+	DeleteUser(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	// rpc GetPolicies(EmptyRequest) returns (Array2DReply) {}
+	// rpc GetPoliciesInDomain(UserRoleInDomainRequest) returns (Array2DReply) {}
+	GetNamedPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*Array2DReply, error)
+	GetFilteredNamedPolicy(ctx context.Context, in *FilteredPolicyRequest, opts ...grpc.CallOption) (*Array2DReply, error)
+	AddNamedPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	AddPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	RemoveNamedPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error)
+	RemovePolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error)
 }
 
 type casbinClient struct {
@@ -72,8 +80,8 @@ func (c *casbinClient) DeleteRolesForUserInDomain(ctx context.Context, in *UserR
 	return out, nil
 }
 
-func (c *casbinClient) GetDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*StringArrayReply, error) {
-	out := new(StringArrayReply)
+func (c *casbinClient) GetDomainsForUser(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*ArrayReply, error) {
+	out := new(ArrayReply)
 	err := c.cc.Invoke(ctx, "/proto.Casbin/GetDomainsForUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,8 +89,8 @@ func (c *casbinClient) GetDomainsForUser(ctx context.Context, in *UserRequest, o
 	return out, nil
 }
 
-func (c *casbinClient) GetRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*StringArrayReply, error) {
-	out := new(StringArrayReply)
+func (c *casbinClient) GetRolesForUserInDomain(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*ArrayReply, error) {
+	out := new(ArrayReply)
 	err := c.cc.Invoke(ctx, "/proto.Casbin/GetRolesForUserInDomain", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -90,8 +98,8 @@ func (c *casbinClient) GetRolesForUserInDomain(ctx context.Context, in *UserRole
 	return out, nil
 }
 
-func (c *casbinClient) GetRolesInDomainsForUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*MapStringArrayReply, error) {
-	out := new(MapStringArrayReply)
+func (c *casbinClient) GetRolesInDomainsForUser(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*MapArrayReply, error) {
+	out := new(MapArrayReply)
 	err := c.cc.Invoke(ctx, "/proto.Casbin/GetRolesInDomainsForUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -99,9 +107,63 @@ func (c *casbinClient) GetRolesInDomainsForUser(ctx context.Context, in *UserReq
 	return out, nil
 }
 
-func (c *casbinClient) GetPolicies(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*StringArray2DReply, error) {
-	out := new(StringArray2DReply)
-	err := c.cc.Invoke(ctx, "/proto.Casbin/GetPolicies", in, out, opts...)
+func (c *casbinClient) DeleteUser(ctx context.Context, in *UserRoleInDomainRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/DeleteUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) GetNamedPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*Array2DReply, error) {
+	out := new(Array2DReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/GetNamedPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) GetFilteredNamedPolicy(ctx context.Context, in *FilteredPolicyRequest, opts ...grpc.CallOption) (*Array2DReply, error) {
+	out := new(Array2DReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/GetFilteredNamedPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) AddNamedPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/AddNamedPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) AddPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/AddPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) RemoveNamedPolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/RemoveNamedPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *casbinClient) RemovePolicy(ctx context.Context, in *PolicyRequest, opts ...grpc.CallOption) (*BoolReply, error) {
+	out := new(BoolReply)
+	err := c.cc.Invoke(ctx, "/proto.Casbin/RemovePolicy", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,10 +178,18 @@ type CasbinServer interface {
 	AddRoleForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
 	DeleteRoleForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
 	DeleteRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
-	GetDomainsForUser(context.Context, *UserRequest) (*StringArrayReply, error)
-	GetRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*StringArrayReply, error)
-	GetRolesInDomainsForUser(context.Context, *UserRequest) (*MapStringArrayReply, error)
-	GetPolicies(context.Context, *EmptyRequest) (*StringArray2DReply, error)
+	GetDomainsForUser(context.Context, *UserRoleInDomainRequest) (*ArrayReply, error)
+	GetRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*ArrayReply, error)
+	GetRolesInDomainsForUser(context.Context, *UserRoleInDomainRequest) (*MapArrayReply, error)
+	DeleteUser(context.Context, *UserRoleInDomainRequest) (*BoolReply, error)
+	// rpc GetPolicies(EmptyRequest) returns (Array2DReply) {}
+	// rpc GetPoliciesInDomain(UserRoleInDomainRequest) returns (Array2DReply) {}
+	GetNamedPolicy(context.Context, *PolicyRequest) (*Array2DReply, error)
+	GetFilteredNamedPolicy(context.Context, *FilteredPolicyRequest) (*Array2DReply, error)
+	AddNamedPolicy(context.Context, *PolicyRequest) (*BoolReply, error)
+	AddPolicy(context.Context, *PolicyRequest) (*BoolReply, error)
+	RemoveNamedPolicy(context.Context, *PolicyRequest) (*BoolReply, error)
+	RemovePolicy(context.Context, *PolicyRequest) (*BoolReply, error)
 }
 
 // UnimplementedCasbinServer should be embedded to have forward compatible implementations.
@@ -138,17 +208,35 @@ func (UnimplementedCasbinServer) DeleteRoleForUserInDomain(context.Context, *Use
 func (UnimplementedCasbinServer) DeleteRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*BoolReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRolesForUserInDomain not implemented")
 }
-func (UnimplementedCasbinServer) GetDomainsForUser(context.Context, *UserRequest) (*StringArrayReply, error) {
+func (UnimplementedCasbinServer) GetDomainsForUser(context.Context, *UserRoleInDomainRequest) (*ArrayReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDomainsForUser not implemented")
 }
-func (UnimplementedCasbinServer) GetRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*StringArrayReply, error) {
+func (UnimplementedCasbinServer) GetRolesForUserInDomain(context.Context, *UserRoleInDomainRequest) (*ArrayReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRolesForUserInDomain not implemented")
 }
-func (UnimplementedCasbinServer) GetRolesInDomainsForUser(context.Context, *UserRequest) (*MapStringArrayReply, error) {
+func (UnimplementedCasbinServer) GetRolesInDomainsForUser(context.Context, *UserRoleInDomainRequest) (*MapArrayReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRolesInDomainsForUser not implemented")
 }
-func (UnimplementedCasbinServer) GetPolicies(context.Context, *EmptyRequest) (*StringArray2DReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPolicies not implemented")
+func (UnimplementedCasbinServer) DeleteUser(context.Context, *UserRoleInDomainRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedCasbinServer) GetNamedPolicy(context.Context, *PolicyRequest) (*Array2DReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNamedPolicy not implemented")
+}
+func (UnimplementedCasbinServer) GetFilteredNamedPolicy(context.Context, *FilteredPolicyRequest) (*Array2DReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFilteredNamedPolicy not implemented")
+}
+func (UnimplementedCasbinServer) AddNamedPolicy(context.Context, *PolicyRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddNamedPolicy not implemented")
+}
+func (UnimplementedCasbinServer) AddPolicy(context.Context, *PolicyRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPolicy not implemented")
+}
+func (UnimplementedCasbinServer) RemoveNamedPolicy(context.Context, *PolicyRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveNamedPolicy not implemented")
+}
+func (UnimplementedCasbinServer) RemovePolicy(context.Context, *PolicyRequest) (*BoolReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePolicy not implemented")
 }
 
 // UnsafeCasbinServer may be embedded to opt out of forward compatibility for this service.
@@ -235,7 +323,7 @@ func _Casbin_DeleteRolesForUserInDomain_Handler(srv interface{}, ctx context.Con
 }
 
 func _Casbin_GetDomainsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserRequest)
+	in := new(UserRoleInDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -247,7 +335,7 @@ func _Casbin_GetDomainsForUser_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/proto.Casbin/GetDomainsForUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CasbinServer).GetDomainsForUser(ctx, req.(*UserRequest))
+		return srv.(CasbinServer).GetDomainsForUser(ctx, req.(*UserRoleInDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -271,7 +359,7 @@ func _Casbin_GetRolesForUserInDomain_Handler(srv interface{}, ctx context.Contex
 }
 
 func _Casbin_GetRolesInDomainsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserRequest)
+	in := new(UserRoleInDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -283,25 +371,133 @@ func _Casbin_GetRolesInDomainsForUser_Handler(srv interface{}, ctx context.Conte
 		FullMethod: "/proto.Casbin/GetRolesInDomainsForUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CasbinServer).GetRolesInDomainsForUser(ctx, req.(*UserRequest))
+		return srv.(CasbinServer).GetRolesInDomainsForUser(ctx, req.(*UserRoleInDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Casbin_GetPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmptyRequest)
+func _Casbin_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRoleInDomainRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CasbinServer).GetPolicies(ctx, in)
+		return srv.(CasbinServer).DeleteUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Casbin/GetPolicies",
+		FullMethod: "/proto.Casbin/DeleteUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CasbinServer).GetPolicies(ctx, req.(*EmptyRequest))
+		return srv.(CasbinServer).DeleteUser(ctx, req.(*UserRoleInDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_GetNamedPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).GetNamedPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/GetNamedPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).GetNamedPolicy(ctx, req.(*PolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_GetFilteredNamedPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FilteredPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).GetFilteredNamedPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/GetFilteredNamedPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).GetFilteredNamedPolicy(ctx, req.(*FilteredPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_AddNamedPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).AddNamedPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/AddNamedPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).AddNamedPolicy(ctx, req.(*PolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_AddPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).AddPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/AddPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).AddPolicy(ctx, req.(*PolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_RemoveNamedPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).RemoveNamedPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/RemoveNamedPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).RemoveNamedPolicy(ctx, req.(*PolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Casbin_RemovePolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CasbinServer).RemovePolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Casbin/RemovePolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CasbinServer).RemovePolicy(ctx, req.(*PolicyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -342,8 +538,32 @@ var Casbin_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Casbin_GetRolesInDomainsForUser_Handler,
 		},
 		{
-			MethodName: "GetPolicies",
-			Handler:    _Casbin_GetPolicies_Handler,
+			MethodName: "DeleteUser",
+			Handler:    _Casbin_DeleteUser_Handler,
+		},
+		{
+			MethodName: "GetNamedPolicy",
+			Handler:    _Casbin_GetNamedPolicy_Handler,
+		},
+		{
+			MethodName: "GetFilteredNamedPolicy",
+			Handler:    _Casbin_GetFilteredNamedPolicy_Handler,
+		},
+		{
+			MethodName: "AddNamedPolicy",
+			Handler:    _Casbin_AddNamedPolicy_Handler,
+		},
+		{
+			MethodName: "AddPolicy",
+			Handler:    _Casbin_AddPolicy_Handler,
+		},
+		{
+			MethodName: "RemoveNamedPolicy",
+			Handler:    _Casbin_RemoveNamedPolicy_Handler,
+		},
+		{
+			MethodName: "RemovePolicy",
+			Handler:    _Casbin_RemovePolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

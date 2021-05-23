@@ -13,7 +13,8 @@ import (
 
 	pb "github.com/alibug/go-identity-casbin-server/gen/casbin/proto"
 	_grpcDelivery "github.com/alibug/go-identity-casbin-server/permission/delivery/grpc"
-	_permissionUseCase "github.com/alibug/go-identity-casbin-server/permission/usecase"
+
+	// _permissionUseCase "github.com/alibug/go-identity-casbin-server/permission/usecase"
 	_casbinAdapter "github.com/casbin/mongodb-adapter/v3"
 )
 
@@ -38,9 +39,9 @@ func main() {
 		log.Fatalf("Init Casbin enforcer fail: %s", err)
 	}
 
-	permissionUseCase := _permissionUseCase.NewPermissionUsecase(enforcer)
+	// permissionUseCase := _permissionUseCase.NewPermissionUsecase(enforcer)
 
-	casbinService := _grpcDelivery.NewCasbinService(permissionUseCase)
+	casbinService := _grpcDelivery.NewCasbinServer(enforcer)
 
 	server := grpc.NewServer()
 

@@ -11,6 +11,17 @@ message PermissionRequest {
   repeated string permissions = 2;
 }
 
+message PolicyRequest {
+  string pType = 1;
+  repeated string params = 2;
+}
+
+message FilteredPolicyRequest {
+  string pType = 2;
+  int32 fieldIndex = 3;
+  repeated string fieldValues = 4;
+}
+
 message EmptyRequest {
 }
 
@@ -20,20 +31,26 @@ message UserRoleInDomainRequest {
   string role = 3;
 }
 
+/*
 message UserRequest {
   string user = 1;
 }
 
-message StringArrayReply {
+message StringRequest {
+  string data = 1;
+}
+*/
+
+message ArrayReply {
   repeated string data =1 ;
 }
 
-message MapStringArrayReply {
-  map<string, StringArrayReply> data = 1;
+message MapArrayReply {
+  map<string, ArrayReply> data = 1;
 }
 
-message StringArray2DReply {
-  repeated StringArrayReply data = 1;
+message Array2DReply {
+  repeated ArrayReply data = 1;
 }
 
 /*
@@ -50,10 +67,24 @@ service Casbin {
   rpc AddRoleForUserInDomain(UserRoleInDomainRequest) returns (BoolReply) {}
   rpc DeleteRoleForUserInDomain(UserRoleInDomainRequest) returns (BoolReply) {}
   rpc DeleteRolesForUserInDomain(UserRoleInDomainRequest) returns (BoolReply) {}
-  rpc GetDomainsForUser(UserRequest) returns (StringArrayReply) {}
-  rpc GetRolesForUserInDomain(UserRoleInDomainRequest) returns (StringArrayReply) {}
-  rpc GetRolesInDomainsForUser(UserRequest) returns (MapStringArrayReply) {}
+  rpc GetDomainsForUser(UserRoleInDomainRequest) returns (ArrayReply) {}
+  rpc GetRolesForUserInDomain(UserRoleInDomainRequest) returns (ArrayReply) {}
+  rpc GetRolesInDomainsForUser(UserRoleInDomainRequest) returns (MapArrayReply) {}
 
-  rpc GetPolicies(EmptyRequest) returns (StringArray2DReply) {}
+  rpc DeleteUser(UserRoleInDomainRequest)returns (BoolReply) {}
+
+  // rpc GetPolicies(EmptyRequest) returns (Array2DReply) {}
+  // rpc GetPoliciesInDomain(UserRoleInDomainRequest) returns (Array2DReply) {}
+  rpc GetNamedPolicy (PolicyRequest) returns (Array2DReply) {}
+  rpc GetFilteredNamedPolicy (FilteredPolicyRequest) returns (Array2DReply) {}
+  rpc AddNamedPolicy(PolicyRequest) returns (BoolReply) {}
+  rpc AddPolicy (PolicyRequest) returns (BoolReply) {}
+  rpc RemoveNamedPolicy(PolicyRequest) returns (BoolReply) {}
+  rpc RemovePolicy (PolicyRequest) returns (BoolReply) {}
 }
+
+/*
+		RemoveFilteredNamedPolicy(domain string) (bool, error)
+		DeleteUser(userID string) (bool, error)
+*/
 

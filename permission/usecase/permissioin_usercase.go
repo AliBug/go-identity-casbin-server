@@ -120,6 +120,16 @@ func (uc *permissionUsecase) GetRolesInDomainsForUserUC(req domain.UserRequest) 
 	return result, nil
 }
 
-func (uc *permissionUsecase) GetPolicies() [][]string {
+func (uc *permissionUsecase) GetPoliciesUC() [][]string {
 	return uc.enforcer.GetNamedPolicy("p")
 }
+
+func (uc *permissionUsecase) GetNamedFilteredPolicyUC(req domain.FilteredPolicyRequest) [][]string {
+	return uc.enforcer.GetFilteredNamedPolicy(req.GetPType(), int(req.GetFieldIndex()), req.GetFieldValues()...)
+}
+
+/*
+func (uc *permissionUsecase) GetPoliciesInDomainUC(req domain.DomaiRequest) [][]string {
+	return uc.enforcer.GetFilteredNamedPolicy("p", 1, req.GetDomain())
+}
+*/
