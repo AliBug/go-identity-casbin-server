@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"log"
 
 	pb "github.com/alibug/go-identity-casbin-server/gen/casbin/proto"
 	"github.com/casbin/casbin/v2"
@@ -18,6 +19,8 @@ func NewCasbinServer(e *casbin.Enforcer) pb.CasbinServer {
 	return &casbinServer{enforcer: e}
 }
 
+// 必须修改!
+/*
 func (s *casbinServer) HasPermissionForUser(ctx context.Context, req *pb.PermissionRequest) (*pb.BoolReply, error) {
 	roles, err := s.enforcer.GetImplicitRolesForUser(req.GetUser(), req.GetPermissions()[0])
 
@@ -33,6 +36,28 @@ func (s *casbinServer) HasPermissionForUser(ctx context.Context, req *pb.Permiss
 	}
 
 	return &pb.BoolReply{Res: false}, nil
+}
+*/
+
+func (s *casbinServer) HasPermissionForUser(ctx context.Context, req *pb.PermissionRequest) (*pb.BoolReply, error) {
+	// 1、组成参数的数组
+	parameters := append([]string{req.GetUser()}, req.GetPermissions()...)
+
+	// 2、转换类型
+	rvals := make([]interface{}, len(parameters))
+
+	for i := range rvals {
+		rvals[i] = parameters[i]
+	}
+
+	log.Println("rvals: ", rvals)
+
+	// 2、计算 enforce结果
+	result, err := s.enforcer.Enforce(rvals...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+	return &pb.BoolReply{Res: result}, nil
 }
 
 func (s *casbinServer) AddRoleForUserInDomain(ctx context.Context, req *pb.UserRoleInDomainRequest) (*pb.BoolReply, error) {

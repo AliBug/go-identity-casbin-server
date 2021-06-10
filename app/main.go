@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	log.Println("启动")
+	log.Println("启动?")
 	mongoURL := config.ReadMongoConfig("mongo")
 
 	duration := config.ReadCustomIntConfig("mongo.duration", false)
@@ -48,6 +48,7 @@ func main() {
 	pb.RegisterCasbinServer(server, casbinService)
 
 	port := config.ReadCustomStringConfig("grpc.port")
+	log.Println("port:", port)
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("net.Listen err: %v", err)
